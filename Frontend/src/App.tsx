@@ -1,35 +1,33 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+
+// Placeholder untuk 5 halaman (Nanti bisa dipisah ke file masing-masing di folder src/pages/)
+const Dashboard = () => <div className="p-8 text-2xl font-bold">Halaman Dashboard</div>;
+const Scan = () => <div className="p-8 text-2xl font-bold">Halaman Scan AI</div>;
+const History = () => <div className="p-8 text-2xl font-bold">Halaman Riwayat Pemeriksaan</div>;
+const AboutUs = () => <div className="p-8 text-2xl font-bold">Halaman Tentang Kami</div>;
+const Profile = () => <div className="p-8 text-2xl font-bold">Halaman Profil Pengguna</div>;
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <Router>
+      <div className="flex h-screen bg-gray-50">
+        {/* Sidebar / Navbar di kiri */}
+        <Navbar />
+
+        {/* Area Konten Utama di kanan */}
+        <div className="flex-1 overflow-y-auto">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/scan" element={<Scan />} />
+            <Route path="/history" element={<History />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/profile" element={<Profile />} />
+          </Routes>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </Router>
+  );
 }
 
-export default App
+export default App;
