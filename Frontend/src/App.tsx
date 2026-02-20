@@ -2,9 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Scan from './pages/Scan';
 import AboutUs from './pages/AboutUs';
+import History from './pages/History';
 
 const Dashboard = () => <div className="p-8 text-2xl font-bold">Halaman Dashboard</div>;
-const History = () => <div className="p-8 text-2xl font-bold">Halaman Riwayat Pemeriksaan</div>;
 const Profile = () => <div className="p-8 text-2xl font-bold">Halaman Profil Pengguna</div>;
 
 function App() {
