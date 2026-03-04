@@ -14,6 +14,11 @@ from torchvision import transforms
 from PIL import Image
 import io
 
+import numpy as np
+import cv2
+from pytorch_grad_cam import GradCAM
+from pytorch_grad_cam.utils.image import show_cam_on_image
+
 app = FastAPI()
 
 app.add_middleware(
@@ -24,18 +29,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-UPLOAD_DIR = "uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-
 DB_FILE = "oncocare.db"
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 model_path = './models/model.keras'
+cam = None 
+
 try:
     model = torch.load(model_path, map_location=device, weights_only=False)
     model = model.to(device)
     model.eval() 
+    print("Model berhasil dimuat!")
+    
+    target_layers = [model.features[-1]]
+    cam = GradCAM(model=model, target_layers=target_layers)
+    
     
 except Exception as e:
     print(f"Gagal memuat model. Pastikan path benar. Error: {e}")
@@ -46,6 +55,11 @@ transform = transforms.Compose([
     transforms.CenterCrop(224),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
+
+visual_transform = transforms.Compose([
+    transforms.Resize(256),
+    transforms.CenterCrop(224)
 ])
 
 class_names = ["Benign", "Malignant", "Normal"]
@@ -71,7 +85,10 @@ init_db()
 async def scan_image(file: UploadFile = File(...)):
     contents = await file.read()
     
-    if model is not None:
+    encoded_image = base64.b64encode(contents).decode("utf-8")
+    gradcam_base64 = f"data:{file.content_type};base64,{encoded_image}"
+    
+    if model is not None and cam is not None:
         try:
             image = Image.open(io.BytesIO(contents)).convert('RGB')
             
@@ -85,8 +102,24 @@ async def scan_image(file: UploadFile = File(...)):
             prediction = class_names[predicted_idx.item()]
             confidence = round(float(confidence_tensor.item()), 4) 
             
+            # Gradcam
+            visual_img_pil = visual_transform(image)
+            visual_img_np = np.float32(visual_img_pil) / 255.0
+            
+            grayscale_cam = cam(input_tensor=input_tensor, targets=None)
+            grayscale_cam = grayscale_cam[0, :]
+            
+            visualization = show_cam_on_image(visual_img_np, grayscale_cam, use_rgb=True)
+            
+            result_img_pil = Image.fromarray(visualization)
+            buffered = io.BytesIO()
+            result_img_pil.save(buffered, format="JPEG")
+            gradcam_encoded = base64.b64encode(buffered.getvalue()).decode("utf-8")
+            
+            gradcam_base64 = f"data:image/jpeg;base64,{gradcam_encoded}"
+            
         except Exception as e:
-            print(f"Error saat inferensi: {e}")
+            print(f"Error saat inferensi atau GradCAM: {e}")
             prediction = "Error"
             confidence = 0.0
     else:
@@ -94,9 +127,6 @@ async def scan_image(file: UploadFile = File(...)):
         await asyncio.sleep(1) 
         prediction = random.choice(["Malignant", "Benign", "Normal"])
         confidence = round(random.uniform(0.75, 0.99), 4)
-    
-    encoded_image = base64.b64encode(contents).decode("utf-8")
-    gradcam_base64 = f"data:{file.content_type};base64,{encoded_image}"
     
     timestamp = datetime.now().strftime("%d %B %Y, %H:%M")
     
@@ -108,7 +138,6 @@ async def scan_image(file: UploadFile = File(...)):
         VALUES (?, ?, ?, ?)
     ''', (timestamp, prediction, confidence, gradcam_base64))
     
-    # Ambil ID yang baru saja dibuat
     inserted_id = cursor.lastrowid 
     conn.commit()
     conn.close()
