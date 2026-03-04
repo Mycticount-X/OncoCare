@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Scan from './pages/Scan';
 import AboutUs from './pages/AboutUs';
 import History from './pages/History';
+import Auth from './pages/Auth';
 
 const Dashboard = () => <div className="p-8 text-2xl font-bold">Halaman Dashboard</div>;
 const Profile = () => <div className="p-8 text-2xl font-bold">Halaman Profil Pengguna</div>;
@@ -19,6 +20,7 @@ function App() {
             <Route path="/history" element={<History />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/auth" element={<Auth />} />
           </Routes>
         </div>
       </div>
