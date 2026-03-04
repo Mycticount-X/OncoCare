@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { HeartPulse, Mail, Lock, User, Loader2, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Auth() {
     const [isLogin, setIsLogin] = useState(true);
@@ -10,6 +11,7 @@ export default function Auth() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -24,6 +26,7 @@ export default function Auth() {
                     password
                 });
                 if (error) throw error;
+                navigate('/');
             } else {
                 const { error } = await supabase.auth.signUp({
                     email,

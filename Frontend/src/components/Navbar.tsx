@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Menu, LayoutDashboard, ScanLine, History, Info, User, LogIn } from 'lucide-react';
+import { Menu, LayoutDashboard, ScanLine, History, Info, User} from 'lucide-react';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,7 +14,6 @@ export default function Navbar() {
   const bottomLinks = [
     { name: 'About Us', path: '/about', icon: Info },
     { name: 'Profile', path: '/profile', icon: User },
-    { name: 'Login / Register', path: '/auth', icon: LogIn },
   ];
 
     return (
