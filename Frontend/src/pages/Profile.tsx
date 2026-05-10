@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { User, Briefcase, Building, Mail, Loader2, Save, CheckCircle2, AlertCircle } from 'lucide-react';
+import { User, Briefcase, Building, Mail, Loader2, Save, CheckCircle2, AlertCircle, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     
@@ -81,6 +83,17 @@ export default function Profile() {
             </div>
         );
     }
+
+    const handleLogout = async () => {
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+            
+            navigate('/login');
+        } catch (err: any) {
+            setError(err.message || 'Gagal keluar dari akun.');
+        }
+    };
 
     return (
         <div className="p-8 max-w-3xl mx-auto">
@@ -167,15 +180,27 @@ export default function Profile() {
                         </div>
                     </div>
 
-                    <div className="pt-4 border-t mt-8">
+                    <div className="pt-4 border-t mt-8 flex flex-col md:flex-row gap-4 justify-between">
+                        {/* Submit */}
                         <button 
                             type="submit" 
                             disabled={isSaving}
-                            className="w-full md:w-auto px-8 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors flex justify-center items-center gap-2"
+                            className="w-full md:w-auto px-8 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors flex justify-center items-center gap-2 order-1 md:order-1"
                         >
                             {isSaving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
                             {isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
                         </button>
+
+                        {/* Logout */}
+                        <button
+                            type="button" 
+                            onClick={handleLogout}
+                            className="w-full md:w-auto px-8 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-colors flex justify-center items-center gap-2 order-2 md:order-2"
+                        >
+                            <LogOut size={20} />
+                            Keluar Akun
+                        </button>
+                        
                     </div>
                 </form>
             </div>
