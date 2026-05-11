@@ -1,5 +1,5 @@
 import { useState, type DragEvent, type ChangeEvent } from 'react';
-import { UploadCloud, FileImage, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { UploadCloud, FileImage, Loader2, AlertCircle, CheckCircle2, RotateCcw} from 'lucide-react';
 
 interface ScanResult {
     prediction: string;
@@ -40,6 +40,13 @@ export default function Scan() {
         setResult(null);
         setSelectedFile(file);
         setPreviewUrl(URL.createObjectURL(file));
+    };
+
+    const handleReset = () => {
+        setSelectedFile(null);
+        setPreviewUrl(null);
+        setResult(null);
+        setError(null);
     };
 
     const handleScan = async () => {
@@ -91,7 +98,16 @@ export default function Scan() {
                             ${previewUrl ? 'border-blue-300 bg-blue-50' : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'}`}
                     >
                         {previewUrl ? (
-                            <img src={previewUrl} alt="Preview" className="max-h-64 mx-auto rounded-lg shadow-sm" />
+                            <div className="relative">
+                                <img src={previewUrl} alt="Preview" className="max-h-64 mx-auto rounded-lg shadow-sm" />
+                                
+                                {!result && !isLoading && (
+                                    <label className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white px-4 py-1.5 rounded-full text-sm font-medium text-blue-600 border shadow-sm cursor-pointer hover:bg-blue-50 transition-colors">
+                                        Ganti File
+                                        <input type="file" className="hidden" accept="image/*" onChange={handleChange} />
+                                    </label>
+                                )}
+                            </div>
                         ) : (
                             <div className="flex flex-col items-center justify-center py-8">
                                 <UploadCloud size={48} className="text-gray-400 mb-4" />
@@ -111,15 +127,24 @@ export default function Scan() {
                         </div>
                     )}
 
-                    <button
-                        onClick={handleScan}
-                        disabled={!selectedFile || isLoading}
-                        className={`w-full mt-6 py-3 rounded-xl font-semibold flex justify-center items-center gap-2 transition-all
-                            ${!selectedFile ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 
-                                isLoading ? 'bg-blue-400 text-white cursor-wait' : 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'}`}
-                    >
-                        {isLoading ? <><Loader2 className="animate-spin" /> Menganalisis...</> : 'Mulai Analisis AI'}
-                    </button>
+                    {result ? (
+                        <button
+                            onClick={handleReset}
+                            className="w-full mt-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors flex justify-center items-center gap-2"
+                        >
+                            <RotateCcw size={20} /> Pindai Citra Lainnya
+                        </button>
+                    ) : (
+                        <button
+                            onClick={handleScan}
+                            disabled={!selectedFile || isLoading}
+                            className={`w-full mt-6 py-3 rounded-xl font-semibold flex justify-center items-center gap-2 transition-all
+                                ${!selectedFile ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 
+                                    isLoading ? 'bg-blue-400 text-white cursor-wait' : 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'}`}
+                        >
+                            {isLoading ? <><Loader2 className="animate-spin" /> Menganalisis...</> : 'Mulai Analisis AI'}
+                        </button>
+                    )}
                 </div>
 
                 <div className="bg-white p-6 rounded-2xl shadow-sm border flex flex-col">
