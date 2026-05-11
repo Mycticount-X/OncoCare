@@ -18,7 +18,7 @@ export default function AboutUs() {
           <h2 className="text-3xl font-bold text-gray-800 mb-4">Filosofi Kami</h2>
           <p className="text-gray-600 leading-relaxed mb-4">
             Nama <span className="font-semibold text-blue-600">OncoCare</span> berakar dari kata 
-            <span className="font-semibold italic"> Oncology</span>—cabang ilmu kedokteran yang berfokus pada studi, diagnosis, pencegahan, dan pengobatan kanker. 
+            <span className="font-semibold italic"> Oncology</span> , cabang ilmu kedokteran yang berfokus pada studi, diagnosis, pencegahan, dan pengobatan kanker. 
           </p>
           <p className="text-gray-600 leading-relaxed">
             Dipadukan dengan kata <span className="font-semibold italic">Care</span>, aplikasi ini hadir sebagai bentuk kepedulian untuk mendampingi para patologis. Kami menyadari bahwa di balik setiap sampel jaringan biopsi, terdapat nyawa pasien yang menanti kepastian diagnosis.
