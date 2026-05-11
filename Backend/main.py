@@ -169,3 +169,23 @@ def get_history():
         "status": "success",
         "data": history_list
     }
+
+@app.delete("/api/history/{item_id}")
+def delete_history(item_id: int):
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+        
+        cursor.execute('DELETE FROM scan_history WHERE id = ?', (item_id,))
+        conn.commit()
+        
+        rows_affected = cursor.rowcount
+        conn.close()
+        
+        if rows_affected == 0:
+            return {"status": "error", "message": "Data tidak ditemukan"}
+            
+        return {"status": "success", "message": "Data berhasil dihapus"}
+        
+    except Exception as e:
+        return {"status": "error", "message": str(e)}

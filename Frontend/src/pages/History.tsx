@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Clock, Activity, AlertCircle, Loader2, Database } from 'lucide-react';
+import { Clock, Activity, AlertCircle, Loader2, Database, Trash2 } from 'lucide-react';
 
 interface HistoryItem {
     id: number;
@@ -30,6 +30,24 @@ export default function History() {
             console.error(err);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleDelete = async (id: number) => {
+        if (!window.confirm('Apakah Anda yakin ingin menghapus riwayat scan ini?')) return;
+
+        try {
+            const response = await fetch(`http://localhost:8000/api/history/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) throw new Error('Gagal menghapus data di server');
+
+            setHistory(prevHistory => prevHistory.filter(item => item.id !== id));
+            
+        } catch (err) {
+            console.error(err);
+            alert('Gagal menghapus riwayat. Pastikan server berjalan.');
         }
     };
 
@@ -78,6 +96,15 @@ export default function History() {
                                     alt={`Scan ${item.id}`} 
                                     className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-500"
                                 />
+
+                                <button
+                                    onClick={() => handleDelete(item.id)}
+                                    className="absolute top-3 left-3 p-2 bg-white/90 hover:bg-red-50 text-gray-500 hover:text-red-600 rounded-full border shadow-sm backdrop-blur-md transition-colors"
+                                    title="Hapus riwayat ini"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+
                                 <div className={`absolute top-3 right-3 px-3 py-1.5 rounded-full text-xs font-bold border shadow-sm backdrop-blur-md bg-white/90
                                     ${item.prediction === 'Malignant' ? 'text-red-600 border-red-200' : 'text-green-600 border-green-200'}`}>
                                     {item.prediction}
