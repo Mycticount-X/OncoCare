@@ -1,9 +1,36 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import { Activity, FileImage, AlertTriangle, ArrowRight, Clock } from 'lucide-react';
 
 export default function Dashboard() {
     const { user } = useAuth();
+    const [fullName, setFullName] = useState<string>('');
+
+    useEffect(() => {
+        const fetchProfileName = async () => {
+            if (!user) return;
+            
+            try {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('full_name')
+                    .eq('id', user.id)
+                    .single();
+
+                if (error) throw error;
+
+                if (data && data.full_name) {
+                    setFullName(data.full_name);
+                }
+            } catch (err: any) {
+                console.error('Error fetching profile name:', err.message);
+            }
+        };
+
+        fetchProfileName();
+    }, [user]);
 
     const stats = [
         { title: 'Total Analisis', value: '124', icon: FileImage, color: 'text-blue-600', bg: 'bg-blue-100' },
@@ -23,10 +50,10 @@ export default function Dashboard() {
             <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-3xl p-8 text-white shadow-lg mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
                     <h1 className="text-3xl font-bold mb-2">
-                        Selamat datang, {user?.email?.split('@')[0] || 'Dokter'}!
+                        Selamat datang, {fullName || 'Dokter'}!
                     </h1>
                     <p className="text-blue-100">
-                        Sistem AI OncoCare siap membantu analisis histopatologi Anda hari ini.
+                        Apa yang ingin Anda analisis hari ini?
                     </p>
                 </div>
                 <Link 

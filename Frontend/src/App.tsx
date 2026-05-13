@@ -1,14 +1,13 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
+import Dashboard from './pages/Dashboard';
 import Scan from './pages/Scan';
 import AboutUs from './pages/AboutUs';
 import History from './pages/History';
 import Auth from './pages/Auth';
 import Profile from './pages/Profile';
 import { Loader2 } from 'lucide-react';
-
-const Dashboard = () => <div className="p-8 text-2xl font-bold">Halaman Dashboard</div>;
 
 const ProtectedRoute = () => {
   const { user, isLoading } = useAuth();
