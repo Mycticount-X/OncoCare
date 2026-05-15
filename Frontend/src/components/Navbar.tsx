@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { Menu, LayoutDashboard, ScanLine, History, Info, User} from 'lucide-react';
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   const topLinks = [
     { name: 'Dashboard', path: '/', icon: LayoutDashboard },
