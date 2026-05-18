@@ -2,11 +2,21 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Activity, FileImage, AlertTriangle, ArrowRight, Clock } from 'lucide-react';
+import { Activity, FileImage, AlertTriangle, ArrowRight, Clock, Loader2 } from 'lucide-react';
+
+interface HistoryItem {
+    id: number;
+    timestamp: string;
+    prediction: string;
+    confidence: number;
+    gradcam_image: string;
+}
 
 export default function Dashboard() {
     const { user } = useAuth();
     const [fullName, setFullName] = useState<string>('');
+    const [scanHistory, setScanHistory] = useState<HistoryItem[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchProfileName = async () => {
@@ -32,17 +42,36 @@ export default function Dashboard() {
         fetchProfileName();
     }, [user]);
 
+    useEffect(() => {
+        const fetchHistory = async () => {
+            try {
+                const response = await fetch('http://localhost:8000/api/history');
+                if (!response.ok) throw new Error('Gagal mengambil data');
+                
+                const result = await response.json();
+                setScanHistory(result.data); 
+            } catch (error) {
+                console.error("Gagal menarik data riwayat:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchHistory();
+    }, []);
+
+    const totalScans = scanHistory.length;
+    const malignantCount = scanHistory.filter(scan => scan.prediction === 'Malignant').length;
+    const avgConfidence = totalScans > 0 
+        ? (scanHistory.reduce((acc, curr) => acc + curr.confidence, 0) / totalScans * 100).toFixed(1) 
+        : 0;
+
     const stats = [
-        { title: 'Total Analisis', value: '124', icon: FileImage, color: 'text-blue-600', bg: 'bg-blue-100' },
-        { title: 'Terdeteksi Malignant', value: '18', icon: AlertTriangle, color: 'text-rose-600', bg: 'bg-rose-100' },
-        { title: 'Rata-rata Confidence', value: '94.2%', icon: Activity, color: 'text-emerald-600', bg: 'bg-emerald-100' },
+        { title: 'Total Analisis', value: totalScans.toString(), icon: FileImage, color: 'text-blue-600', bg: 'bg-blue-100' },
+        { title: 'Terdeteksi Malignant', value: malignantCount.toString(), icon: AlertTriangle, color: 'text-rose-600', bg: 'bg-rose-100' },
+        { title: 'Rata-rata Confidence', value: `${avgConfidence}%`, icon: Activity, color: 'text-emerald-600', bg: 'bg-emerald-100' },
     ];
 
-    const recentScans = [
-        { id: 104, date: '13 Mei 2026, 10:30', prediction: 'Malignant', confidence: 96 },
-        { id: 103, date: '12 Mei 2026, 14:15', prediction: 'Benign', confidence: 89 },
-        { id: 102, date: '10 Mei 2026, 09:00', prediction: 'Normal', confidence: 98 },
-    ];
+    const recentScans = scanHistory.slice(0, 3);
 
     return (
         <div className="p-8 max-w-6xl mx-auto animate-in fade-in duration-500">
@@ -74,7 +103,9 @@ export default function Dashboard() {
                         </div>
                         <div>
                             <p className="text-sm font-medium text-gray-500">{stat.title}</p>
-                            <h3 className="text-2xl font-bold text-gray-800">{stat.value}</h3>
+                            <h3 className="text-2xl font-bold text-gray-800">
+                                {isLoading ? <Loader2 className="animate-spin text-gray-400" size={24} /> : stat.value}
+                            </h3>
                         </div>
                     </div>
                 ))}
@@ -91,32 +122,42 @@ export default function Dashboard() {
                     </Link>
                 </div>
                 <div className="divide-y">
-                    {recentScans.map((scan) => (
-                        <div key={scan.id} className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                            <div className="flex items-center gap-4">
-                                <div className={`w-3 h-3 rounded-full ${
-                                    scan.prediction === 'Malignant' ? 'bg-red-500' : 
-                                    scan.prediction === 'Benign' ? 'bg-orange-400' : 'bg-green-500'
-                                }`}></div>
-                                <div>
-                                    <p className="font-semibold text-gray-800">Scan #{scan.id}</p>
-                                    <p className="text-sm text-gray-500">{scan.date}</p>
+                    {isLoading ? (
+                        <div className="p-8 flex justify-center items-center">
+                            <Loader2 className="animate-spin text-blue-500" size={32} />
+                        </div>
+                    ) : recentScans.length === 0 ? (
+                        <div className="p-8 text-center text-gray-500">
+                            Belum ada riwayat pemindaian.
+                        </div>
+                    ) : (
+                        recentScans.map((scan) => (
+                            <div key={scan.id} className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-3 h-3 rounded-full ${
+                                        scan.prediction === 'Malignant' ? 'bg-red-500' : 
+                                        scan.prediction === 'Benign' ? 'bg-orange-400' : 'bg-green-500'
+                                    }`}></div>
+                                    <div>
+                                        <p className="font-semibold text-gray-800">Scan #{scan.id}</p>
+                                        <p className="text-sm text-gray-500">{scan.timestamp}</p> {/* <-- Perubahan: scan.timestamp */}
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                                        scan.prediction === 'Malignant' ? 'text-red-700 bg-red-50 border-red-200' : 
+                                        scan.prediction === 'Benign' ? 'text-orange-700 bg-orange-50 border-orange-200' : 
+                                        'text-green-700 bg-green-50 border-green-200'
+                                    }`}>
+                                        {scan.prediction}
+                                    </span>
+                                    <p className="text-sm font-medium text-gray-600 mt-1">
+                                        Conf: {Math.round(scan.confidence * 100)}% {/* <-- Perubahan: Konversi ke persentase */}
+                                    </p>
                                 </div>
                             </div>
-                            <div className="text-right">
-                                <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
-                                    scan.prediction === 'Malignant' ? 'text-red-700 bg-red-50 border-red-200' : 
-                                    scan.prediction === 'Benign' ? 'text-orange-700 bg-orange-50 border-orange-200' : 
-                                    'text-green-700 bg-green-50 border-green-200'
-                                }`}>
-                                    {scan.prediction}
-                                </span>
-                                <p className="text-sm font-medium text-gray-600 mt-1">
-                                    Conf: {scan.confidence}%
-                                </p>
-                            </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
             </div>
         </div>
