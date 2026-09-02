@@ -6,7 +6,7 @@ export default function AboutUs() {
       <div className="text-center mb-12 mt-8">
         <h1 className="text-4xl font-bold text-gray-800 mb-4">Tentang OncoCare</h1>
         <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-          Menjembatani keahlian medis dan kecerdasan buatan untuk masa depan diagnosis histopatologi yang lebih cepat, transparan, dan akurat.
+          Menjembatani keahlian medis dan kecerdasan buatan untuk masa depan diagnosis ultraound yang lebih cepat, transparan, dan akurat.
         </p>
       </div>
 
@@ -31,17 +31,17 @@ export default function AboutUs() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-2xl shadow-sm border hover:shadow-md transition-shadow">
             <Microscope className="text-blue-500 mb-4" size={28} />
-            <h4 className="text-xl font-semibold mb-2">Analisis Histopatologi</h4>
+            <h4 className="text-xl font-semibold mb-2">Analisis Ultrasound</h4>
             <p className="text-gray-600 text-sm">
-              Berfokus pada analisis citra mikroskopis jaringan payudara untuk membedakan antara sel malignan (ganas) dan benign (jinak) secara presisi.
+              Berfokus pada analisis citra ultrasound jaringan payudara untuk membedakan antara sel malignan (ganas) dan benign (jinak) secara presisi.
             </p>
           </div>
 
           <div className="bg-white p-6 rounded-2xl shadow-sm border hover:shadow-md transition-shadow">
             <BrainCircuit className="text-purple-500 mb-4" size={28} />
-            <h4 className="text-xl font-semibold mb-2">Deep Learning (ResNet50)</h4>
+            <h4 className="text-xl font-semibold mb-2">Deep Learning</h4>
             <p className="text-gray-600 text-sm">
-              Ditenagai oleh arsitektur Convolutional Neural Network (CNN) tingkat lanjut yang mampu mengekstraksi pola visual kompleks dari citra medis.
+              Ditenagai oleh arsitektur DenseNet121 tingkat lanjut yang mampu mengekstraksi pola visual kompleks dari citra medis.
             </p>
           </div>
 

@@ -58,7 +58,7 @@ export default function History() {
                     <Database className="text-blue-600" size={32} />
                     Riwayat Pemeriksaan
                 </h1>
-                <p className="text-gray-500 mt-2">Daftar analisis histopatologi yang telah diproses dan disimpan ke dalam database.</p>
+                <p className="text-gray-500 mt-2">Daftar analisis ultrasound yang telah diproses dan disimpan ke dalam database.</p>
             </div>
 
             {/* State 1: Sedang Loading */

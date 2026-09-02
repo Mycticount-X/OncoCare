@@ -81,8 +81,8 @@ export default function Scan() {
     return (
         <div className="p-8 max-w-5xl mx-auto">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">Scan Histopatologi</h1>
-                <p className="text-gray-500 mt-2">Unggah citra biopsi jaringan payudara untuk dianalisis oleh model AI kami.</p>
+                <h1 className="text-3xl font-bold text-gray-800">Scan Ultrasound</h1>
+                <p className="text-gray-500 mt-2">Unggah citra ultrasound untuk dianalisis oleh model AI kami.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -178,7 +178,7 @@ export default function Scan() {
                                 <div className="border rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center min-h-[250px]">
                                     <img src={result.gradcam_image} alt="Grad-CAM Result" className="max-h-64 object-contain" />
                                 </div>
-                                <p className="text-xs text-gray-400 mt-2 italic">*Area berwarna merah/panas menunjukkan bagian citra yang paling mempengaruhi keputusan model ResNet50.</p>
+                                <p className="text-xs text-gray-400 mt-2 italic">*Area berwarna merah/panas menunjukkan bagian citra yang paling mempengaruhi keputusan model DenseNet121.</p>
                             </div>
                         </div>
                     ) : (
